@@ -6,6 +6,9 @@ var speed
 @export var jump = 5.0
 @export var gravity = 9.8
 @export var sensitivity = 0.003
+@export var bob_freq = 2.0
+@export var bob_amp = 0.1
+@export var t_bob = 0.0
 @onready var head = $Head
 @onready var camera = $Head/Camera
 
@@ -50,4 +53,15 @@ func _physics_process(delta):
 		velocity.x = lerp(velocity.x, direction.x * speed, delta * 3.0)
 		velocity.z = lerp(velocity.z, direction.z * speed, delta * 3.0)
 		
+		
+	# HEAD BOB
+	t_bob += delta * velocity.length() * float(is_on_floor())
+	camera.transform.origin = headbob(t_bob)
+	
 	move_and_slide()
+
+func headbob(time) -> Vector3:
+	var pos = Vector3.ZERO
+	pos.y = sin(time * bob_freq) * bob_amp
+	pos.x = cos(time * bob_freq / 2) * bob_amp
+	return pos
